@@ -1,5 +1,16 @@
 # Projet-A52
 
+## Techno
+
+[Kaplay](https://kaplayjs.com)
+
+## Etapes
+
+### Etape 1
+
+- grille carrée sur laquelle on peut se déplacer
+- host sur gitlab pages et envoyer le lien
+
 ## Questions
 
 - taille des carrés 
