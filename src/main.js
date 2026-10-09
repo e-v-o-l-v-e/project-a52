@@ -1,13 +1,17 @@
+// main.js
 import kaplay from "kaplay";
 import { enableDragCamera } from "./camera";
+import { infiniteGrid } from "./grid.js";
 
-const k = kaplay();
-
+const k = kaplay({
+    background: [255, 255, 255],
+});
 k.loadRoot("./");
-k.loadSprite("bean", "sprites/bean.png");
-
-k.add([k.pos(120, 80), k.sprite("bean")]);
 
 k.onMousePress("right", () => addKaboom(k.toWorld(k.mousePos())));
+
+k.add([
+    infiniteGrid(k, 64),
+]);
 
 enableDragCamera(k);
