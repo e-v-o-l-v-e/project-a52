@@ -6,7 +6,7 @@ export function enableDragCamera(k: KAPLAYCtx) {
   k.onUpdate(() => {
     if (k.isMouseDown("left")) {
       const delta = k.mouseDeltaPos();
-      k.setCamPos(k.getCamPos().sub(delta));
+      k.setCamPos(k.getCamPos().sub(delta.scale(1 / k.getCamScale().y)));
     }
   });
 
