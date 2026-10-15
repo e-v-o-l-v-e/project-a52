@@ -1,4 +1,3 @@
-// main.js
 import kaplay from "kaplay";
 import { enableDragCamera } from "./camera";
 import { infiniteGrid } from "./grid.ts";
