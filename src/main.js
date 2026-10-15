@@ -1,7 +1,7 @@
 // main.js
 import kaplay from "kaplay";
 import { enableDragCamera } from "./camera";
-import { infiniteGrid } from "./grid.js";
+import { infiniteGrid } from "./grid.ts";
 
 const k = kaplay({
     background: [255, 255, 255],

@@ -1,6 +1,8 @@
+import { KAPLAYCtx } from "kaplay";
+
 const GRID_SIZE = 64;
 
-export function infiniteGrid(k, size = GRID_SIZE, gridColor = null) {
+export function infiniteGrid(k: KAPLAYCtx, size = GRID_SIZE, gridColor = null) {
   const color = gridColor || k.rgb(60, 60, 75);
 
   return {
