@@ -3,14 +3,11 @@ import { enableDragCamera } from "./camera";
 import { infiniteGrid } from "./grid.ts";
 
 const k = kaplay({
-    background: [255, 255, 255],
+  background: [255, 255, 255],
 });
 k.loadRoot("./");
 
-k.onMousePress("right", () => addKaboom(k.toWorld(k.mousePos())));
+k.onMousePress("right", () => k.addKaboom(k.toWorld(k.mousePos())));
 
-k.add([
-    infiniteGrid(k, 64),
-]);
-
+infiniteGrid(k, 64);
 enableDragCamera(k);

@@ -5,35 +5,45 @@ const GRID_SIZE = 64;
 export function infiniteGrid(k: KAPLAYCtx, size = GRID_SIZE, gridColor = null) {
   const color = gridColor || k.rgb(60, 60, 75);
 
-  return {
-    id: "infiniteGrid",
-    draw() {
-      const topLeft = k.toWorld(k.vec2(0, 0));
-      const bottomRight = k.toWorld(k.vec2(k.width(), k.height()));
+  k.onDraw(() => {
+    // get camera informations
+    const camPos = k.getCamPos();
+    const camScale = k.getCamScale();
 
-      const startX = Math.floor(topLeft.x / size) * size;
-      const endX = Math.ceil(bottomRight.x / size) * size;
+    // get screen size, so we don't draw in the void 
+    // outside of the player's visible realm
+    const screenWidth = k.width();
+    const screenHeight = k.height();
 
-      const startY = Math.floor(topLeft.y / size) * size;
-      const endY = Math.ceil(bottomRight.y / size) * size;
+    const worldLeft = camPos.x - (screenWidth / 2) / camScale.x;
+    const worldRight = camPos.x + (screenWidth / 2) / camScale.x;
+    const worldTop = camPos.y - (screenHeight / 2) / camScale.y;
+    const worldBottom = camPos.y + (screenHeight / 2) / camScale.y;
 
-      for (let x = startX; x <= endX; x += size) {
-        k.drawLine({
-          p1: k.vec2(x, startY),
-          p2: k.vec2(x, endY),
-          width: 1,
-          color: color,
-        });
-      }
+    // only draw visible lines
+    const startX = Math.floor(worldLeft / size) * size;
+    const endX = Math.ceil(worldRight / size) * size;
+    const startY = Math.floor(worldTop / size) * size;
+    const endY = Math.ceil(worldBottom / size) * size;
 
-      for (let y = startY; y <= endY; y += size) {
-        k.drawLine({
-          p1: k.vec2(startX, y),
-          p2: k.vec2(endX, y),
-          width: 1,
-          color: color,
-        });
-      }
-    },
-  };
+    // vertical lines
+    for (let x = startX; x <= endX; x += size) {
+      k.drawLine({
+        p1: k.vec2(x, worldTop),
+        p2: k.vec2(x, worldBottom),
+        width: 1 / camScale.x, // keep lines clean no mather the zoom level
+        color: color,
+      });
+    }
+
+    // horizontal lines
+    for (let y = startY; y <= endY; y += size) {
+      k.drawLine({
+        p1: k.vec2(worldLeft, y),
+        p2: k.vec2(worldRight, y),
+        width: 1 / camScale.y,
+        color: color,
+      });
+    }
+  });
 }
