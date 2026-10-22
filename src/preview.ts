@@ -1,6 +1,6 @@
 import { KAPLAYCtx, GameObj } from "kaplay";
 import { tile_size } from "./grid";
-import { getRandomPoly, placePoly, Tetromino } from "./tetromino";
+import { getRandomPoly, placePoly, rotatePoly, Tetromino } from "./tetromino";
 import { getNextTetromino } from "./next-tetrominos";
 
 export function setupPlacementPreview(k: KAPLAYCtx) {
@@ -47,5 +47,10 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
       currentPoly = getNextTetromino(k);
       renderPreview();
     }
+  });
+
+  k.onKeyPress("r", () => {
+    rotatePoly(k, currentPoly);
+    renderPreview();
   });
 }

@@ -124,6 +124,7 @@ export function getRandomPoly(k: KAPLAYCtx): Tetromino {
   const rand = Math.floor(Math.random() * polies.length);
   return polies[rand];
 }
+
 export function placePoly(k: KAPLAYCtx, clickPos: Vec2, poly: Tetromino): boolean {
   console.log("placing random tetromino at " + clickPos);
 
@@ -170,4 +171,15 @@ export function placePoly(k: KAPLAYCtx, clickPos: Vec2, poly: Tetromino): boolea
   });
 
   return true;
+}
+
+export function rotatePoly(k: KAPLAYCtx, tetromino: Tetromino) {
+  // y points down on screen, so (x, y) -> (-y, x) is clockwise
+  const rotated = tetromino.blocks.map((b) => k.vec2(-b.y, b.x));
+
+  // rotating makes some offsets negative: shift so the bounding box
+  // starts at (0, 0) again, which keeps originCell as its top-left corner
+  const minX = Math.min(...rotated.map((b) => b.x));
+  const minY = Math.min(...rotated.map((b) => b.y));
+  tetromino.blocks = rotated.map((b) => b.sub(k.vec2(minX, minY)));
 }
