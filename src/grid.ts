@@ -1,9 +1,11 @@
 import { KAPLAYCtx } from "kaplay";
 
-const GRID_SIZE = 64;
+export let tile_size = 64;
 
-export function infiniteGrid(k: KAPLAYCtx, size = GRID_SIZE, gridColor = null) {
+
+export function infiniteGrid(k: KAPLAYCtx, size = tile_size, gridColor = null) {
   const color = gridColor || k.rgb(60, 60, 75);
+  tile_size = size; // in case the use passes a different value
 
   k.onDraw(() => {
     // get camera informations

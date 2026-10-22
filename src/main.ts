@@ -1,13 +1,17 @@
 import kaplay from "kaplay";
 import { enableDragCamera } from "./camera";
 import { infiniteGrid } from "./grid.ts";
+import { placePoly } from "./tetromino.ts";
 
-const k = kaplay({
+export const k = kaplay({
   background: [255, 255, 255],
 });
 k.loadRoot("./");
 
-k.onMousePress("right", () => k.addKaboom(k.toWorld(k.mousePos())));
-
-infiniteGrid(k, 64);
+infiniteGrid(k);
 enableDragCamera(k);
+
+k.onMousePress("right", () => {
+  placePoly(k, k.toWorld(k.mousePos()));
+});
+
