@@ -124,7 +124,7 @@ export function getRandomPoly(k: KAPLAYCtx): Tetromino {
   const rand = Math.floor(Math.random() * polies.length);
   return polies[rand];
 }
-export function placePoly(k: KAPLAYCtx, clickPos: Vec2) {
+export function placePoly(k: KAPLAYCtx, clickPos: Vec2, poly: Tetromino): boolean {
   console.log("placing random tetromino at " + clickPos);
 
   const originCell = k.vec2(
@@ -132,10 +132,8 @@ export function placePoly(k: KAPLAYCtx, clickPos: Vec2) {
     clickPos.y - (clickPos.y % tile_size)
   );
 
-  const newPiece = getRandomPoly(k);
-
   // where each block of the new piece would land
-  const newBlockCells = newPiece.blocks.map((pos) => originCell.add(pos));
+  const newBlockCells = poly.blocks.map((pos) => originCell.add(pos));
 
   // cells already taken
   const placedBlocks = k.get("block", { recursive: true });
@@ -147,27 +145,29 @@ export function placePoly(k: KAPLAYCtx, clickPos: Vec2) {
     );
   });
 
-  // return true if any of the already occupied cells 
-  // would be overwritten by the new piece
+  // some(callback) returns true if any of the already
+  // occupied cells would be overwritten by the new piece
   const isBlocked = newBlockCells.some((newCell) =>
     takenCells.some((occupiedCell) => newCell.eq(occupiedCell))
   );
 
   if (isBlocked) {
-    console.log("ALREADY SOMETHING THERE, BYE");
-    return;
+    console.log("tetromino cannot be placed here because one cell or more is already occupied");
+    return false;
   }
 
   // place tetromino
   const pieceParent = k.add([k.pos(originCell)]);
-  newPiece.blocks.forEach((pos) => {
+  poly.blocks.forEach((pos) => {
     pieceParent.add([
       k.rect(tile_size, tile_size),
       k.pos(pos),
-      k.color(newPiece.color[0], newPiece.color[1], newPiece.color[2]),
+      k.color(poly.color[0], poly.color[1], poly.color[2]),
       k.outline(2, k.rgb(0, 0, 0)),
       k.area(),
       "block",
     ]);
   });
+
+  return true;
 }
