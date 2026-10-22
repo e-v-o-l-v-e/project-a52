@@ -3,6 +3,7 @@ import { enableDragCamera } from "./camera";
 import { infiniteGrid } from "./grid.ts";
 import { placePoly } from "./tetromino.ts";
 import { setupResetButton } from "./reset-button.ts";
+import { createNextTetrominosUI } from "./next-tetrominos.ts";
 
 export const k = kaplay({
     background: [255, 255, 255],
@@ -17,3 +18,5 @@ k.onMousePress("right", () => {
     placePoly(k, k.toWorld(k.mousePos()));
 });
 
+
+createNextTetrominosUI(k)
