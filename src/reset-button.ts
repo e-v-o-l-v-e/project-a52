@@ -1,9 +1,12 @@
 import { KAPLAYCtx } from "kaplay";
 
 export function setupResetButton(k: KAPLAYCtx) {
+    const rec_width = 160;
+    const rec_height = 40;
+
     const btn = k.add([
-        k.rect(160, 40, { radius: 8 }),
-        k.pos(20, 20),
+        k.rect(rec_width, rec_height, { radius: 8 }),
+        k.pos(k.width() - rec_width - 20, 20),
         k.color(220, 50, 50),
         k.area(),
         k.fixed(),
