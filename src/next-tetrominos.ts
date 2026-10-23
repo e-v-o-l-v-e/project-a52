@@ -66,7 +66,7 @@ export function renderNextTetrominos(k: KAPLAYCtx) {
       k.scale(previewScale),
     ]);
 
-    const [r, g, b] = tetromino.color;
+    const [r, g, b] = tetromino.colors;
     tetromino.blocks.forEach(pos => {
       preview.add([
         k.rect(tile_size, tile_size),
