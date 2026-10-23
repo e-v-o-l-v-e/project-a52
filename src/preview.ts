@@ -1,4 +1,4 @@
-import { KAPLAYCtx, GameObj, ColorComp } from "kaplay";
+import { KAPLAYCtx, GameObj, ColorComp, AreaComp } from "kaplay";
 import { tile_size } from "./grid";
 import { placementAvailable, placePoly, Tetromino } from "./tetromino";
 import { getCurrentTetromino, advanceTetromino, rotateCurrent } from "./next-tetrominos";
@@ -29,7 +29,7 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
   }
 
   const isOverButton = () =>
-    k.get("button").some((b) => (b as GameObj<AreaComp>).isHovering());
+    k.get("button", { recursive: true }).some((b) => (b as GameObj<AreaComp>).isHovering());
 
   k.onUpdate(() => {
 
