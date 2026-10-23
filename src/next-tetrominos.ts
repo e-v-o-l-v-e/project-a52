@@ -110,3 +110,10 @@ export function rotateCurrent(k: KAPLAYCtx) {
   rotatePoly(k, getState().current);
   renderPanel(k);
 }
+
+export function resetQueue(k: KAPLAYCtx) {
+  const s = getState();
+  s.current = getRandomPoly(k);
+  s.queue = Array.from({ length: NB_NEXT }, () => getRandomPoly(k));
+  renderPanel(k);
+}

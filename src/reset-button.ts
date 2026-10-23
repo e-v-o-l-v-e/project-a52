@@ -1,4 +1,5 @@
 import { KAPLAYCtx } from "kaplay";
+import { resetQueue } from "./next-tetrominos";
 
 export function setupResetButton(k: KAPLAYCtx) {
     const rec_width = 160;
@@ -23,6 +24,7 @@ export function setupResetButton(k: KAPLAYCtx) {
     btn.onClick(() => {
         const blocks = k.get("block", { recursive: true });
         blocks.forEach((block) => block.destroy());
+        resetQueue(k)
         console.debug("grid reset: removed " + blocks.length + " blocks");
     });
 }
