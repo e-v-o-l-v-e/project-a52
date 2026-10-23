@@ -6,8 +6,7 @@ export interface Tetromino {
   blocks: Vec2[];
 }
 
-// polies is the plural of poly
-export function getPolies(k: KAPLAYCtx): Tetromino[] {
+export function getTetrominos(k: KAPLAYCtx): Tetromino[] {
   const V = (x: number, y: number) => k.vec2(x * tile_size, y * tile_size);
 
   const T: Tetromino = {
@@ -119,13 +118,13 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
   return [T, I, O, L, J, S, Z];
 }
 
-export function getRandomPoly(k: KAPLAYCtx): Tetromino {
-  const polies = getPolies(k);
-  const rand = Math.floor(Math.random() * polies.length);
-  return polies[rand];
+export function getRandomTetromino(k: KAPLAYCtx): Tetromino {
+  const tetrominos = getTetrominos(k);
+  const rand = Math.floor(Math.random() * tetrominos.length);
+  return tetrominos[rand];
 }
 
-export function placePoly(k: KAPLAYCtx, clickPos: Vec2, tetromino: Tetromino): boolean {
+export function placeTetromino(k: KAPLAYCtx, clickPos: Vec2, tetromino: Tetromino): boolean {
   console.log("placing random tetromino at " + clickPos);
 
   if (!placementAvailable(k, clickPos, tetromino)) {
@@ -184,7 +183,7 @@ export function placementAvailable(k: KAPLAYCtx, mousePos: Vec2, tetromino: Tetr
   return !occupied;
 }
 
-export function rotatePoly(k: KAPLAYCtx, tetromino: Tetromino) {
+export function rotateTetromino(k: KAPLAYCtx, tetromino: Tetromino) {
   // y points down on screen, so (x, y) -> (-y, x) is clockwise
   const rotated = tetromino.blocks.map((b) => k.vec2(-b.y, b.x));
   tetromino.blocks = rotated;

@@ -1,6 +1,6 @@
 import { KAPLAYCtx } from "kaplay";
 import type { GameObj, PosComp } from "kaplay";
-import { Tetromino, getRandomPoly, rotatePoly } from "./tetromino";
+import { Tetromino, getRandomTetromino, rotateTetromino } from "./tetromino";
 import { tile_size } from "./grid";
 
 export const PANEL_X = 20;
@@ -47,8 +47,8 @@ export function createNextTetrominosUI(k: KAPLAYCtx) {
 
   state = {
     previews,
-    current: getRandomPoly(k),
-    queue: Array.from({ length: NB_NEXT }, () => getRandomPoly(k)),
+    current: getRandomTetromino(k),
+    queue: Array.from({ length: NB_NEXT }, () => getRandomTetromino(k)),
   };
 
   renderPanel(k);
@@ -101,19 +101,19 @@ export function getCurrentTetromino(): Tetromino {
 export function advanceTetromino(k: KAPLAYCtx): Tetromino {
   const s = getState();
   s.current = s.queue.shift()!;
-  s.queue.push(getRandomPoly(k));
+  s.queue.push(getRandomTetromino(k));
   renderPanel(k);
   return s.current;
 }
 
 export function rotateCurrent(k: KAPLAYCtx) {
-  rotatePoly(k, getState().current);
+  rotateTetromino(k, getState().current);
   renderPanel(k);
 }
 
 export function resetQueue(k: KAPLAYCtx) {
   const s = getState();
-  s.current = getRandomPoly(k);
-  s.queue = Array.from({ length: NB_NEXT }, () => getRandomPoly(k));
+  s.current = getRandomTetromino(k);
+  s.queue = Array.from({ length: NB_NEXT }, () => getRandomTetromino(k));
   renderPanel(k);
 }

@@ -1,20 +1,20 @@
 import { KAPLAYCtx, GameObj, ColorComp, AreaComp } from "kaplay";
 import { tile_size } from "./grid";
-import { placementAvailable, placePoly, Tetromino } from "./tetromino";
+import { placementAvailable, placeTetromino, Tetromino } from "./tetromino";
 import { getCurrentTetromino, advanceTetromino, rotateCurrent } from "./next-tetrominos";
 
 const BLOCKED_COLORS: [number, number, number] = [255, 50, 50];
 
 export function setupPlacementPreview(k: KAPLAYCtx) {
   let previewContainer: GameObj | null = null;
-  let renderedPoly: Tetromino | null = null;
+  let renderedTetromino: Tetromino | null = null;
   let renderedBlocks: Tetromino["blocks"] | null = null;
 
-  function renderPreview(poly: Tetromino) {
+  function renderPreview(tetromino: Tetromino) {
     previewContainer?.destroy();
     previewContainer = k.add([k.pos(0, 0)]);
 
-    poly.blocks.forEach((blockPos) => {
+    tetromino.blocks.forEach((blockPos) => {
       previewContainer!.add([
         k.rect(tile_size, tile_size),
         k.pos(blockPos),
@@ -24,8 +24,8 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
       ]);
     });
 
-    renderedPoly = poly;
-    renderedBlocks = poly.blocks;
+    renderedTetromino = tetromino;
+    renderedBlocks = tetromino.blocks;
   }
 
   const isOverButton = () =>
@@ -33,9 +33,9 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
 
   k.onUpdate(() => {
 
-    const poly = getCurrentTetromino();
+    const currentTetromino = getCurrentTetromino();
 
-    if (poly !== renderedPoly || poly.blocks !== renderedBlocks) renderPreview(poly);
+    if (currentTetromino !== renderedTetromino || currentTetromino.blocks !== renderedBlocks) renderPreview(currentTetromino);
 
     // hide the preview while the mouse is over a button
     const overButton = isOverButton();
@@ -48,7 +48,7 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
       mouseWorld.y - (mouseWorld.y % tile_size)
     );
 
-    const [r, g, b] = placementAvailable(k, mouseWorld, poly) ? poly.colors : BLOCKED_COLORS;
+    const [r, g, b] = placementAvailable(k, mouseWorld, currentTetromino) ? currentTetromino.colors : BLOCKED_COLORS;
     previewContainer!.children.forEach((child) => {
       (child as GameObj<ColorComp>).color = k.rgb(r, g, b);
     });
@@ -56,7 +56,7 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
 
   // right click: place the current piece, then move on to the next one
   k.onMousePress("right", () => {
-    const placed = placePoly(k, k.toWorld(k.mousePos()), getCurrentTetromino());
+    const placed = placeTetromino(k, k.toWorld(k.mousePos()), getCurrentTetromino());
     if (placed) advanceTetromino(k);   // the preview rebuilds itself next frame
   });
 
