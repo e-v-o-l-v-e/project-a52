@@ -13,6 +13,7 @@ export function setupRotationButton(k: KAPLAYCtx) {
     k.outline(2),
     k.area(),
     k.fixed(),
+    "button"
   ]);
 
   btn.add([

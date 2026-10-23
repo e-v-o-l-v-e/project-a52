@@ -10,6 +10,7 @@ export function setupResetButton(k: KAPLAYCtx) {
         k.color(220, 50, 50),
         k.area(),
         k.fixed(),
+        "button"
     ]);
 
     btn.add([

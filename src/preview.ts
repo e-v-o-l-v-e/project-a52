@@ -28,10 +28,19 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
     renderedBlocks = poly.blocks;
   }
 
+  const isOverButton = () =>
+    k.get("button").some((b) => (b as GameObj<AreaComp>).isHovering());
+
   k.onUpdate(() => {
+
     const poly = getCurrentTetromino();
 
     if (poly !== renderedPoly || poly.blocks !== renderedBlocks) renderPreview(poly);
+
+    // hide the preview while the mouse is over a button
+    const overButton = isOverButton();
+    previewContainer!.hidden = overButton;
+    if (overButton) return;
 
     const mouseWorld = k.toWorld(k.mousePos());
     previewContainer!.pos = k.vec2(
@@ -52,4 +61,5 @@ export function setupPlacementPreview(k: KAPLAYCtx) {
   });
 
   k.onKeyPress("r", () => rotateCurrent(k));
+
 }
