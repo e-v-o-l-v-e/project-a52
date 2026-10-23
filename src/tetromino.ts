@@ -19,10 +19,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //              XXX
       //              XXX
       //               4
-      V(0, 0), // 1
-      V(1, 0), // 2
-      V(2, 0), // 3
-      V(1, 1), // 4
+      V(-1, 0), // 1
+      V(0, 0), // 2
+      V(1, 0), // 3
+      V(0, 1), // 4
     ],
   };
 
@@ -32,10 +32,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //            1  2  3  4
       //           XXXXXXXXXXXXX
       //           XXXXXXXXXXXXX
+      V(-1, 0),
       V(0, 0),
       V(1, 0),
       V(2, 0),
-      V(3, 0),
     ],
   };
 
@@ -62,10 +62,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //          XXX
       //        3 XXXXXXX
       //          XXXXXXX 4
+      V(0, -1),
       V(0, 0),
       V(0, 1),
-      V(0, 2),
-      V(1, 2),
+      V(1, 1),
     ],
   };
 
@@ -78,10 +78,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //           XXX
       //        XXXXXX 3
       //      4 XXXXXX 
-      V(1, 0),
-      V(1, 1),
-      V(1, 2),
-      V(0, 2),
+      V(0, -1),
+      V(0, 0),
+      V(0, 1),
+      V(-1, 1),
     ],
   };
 
@@ -93,10 +93,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //             XXXXXX
       //        2 XXXXXX
       //          XXXXXX 3
+      V(0, 0),
       V(1, 0),
-      V(2, 0),
+      V(-1, 1),
       V(0, 1),
-      V(1, 1),
     ],
   };
 
@@ -109,10 +109,10 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
       //                XXXXXX
       //                XXXXXX
       //               3      4
+      V(-1, 0),
       V(0, 0),
-      V(1, 0),
+      V(0, 1),
       V(1, 1),
-      V(2, 1),
     ],
   };
 
@@ -187,10 +187,5 @@ export function placementAvailable(k: KAPLAYCtx, mousePos: Vec2, tetromino: Tetr
 export function rotatePoly(k: KAPLAYCtx, tetromino: Tetromino) {
   // y points down on screen, so (x, y) -> (-y, x) is clockwise
   const rotated = tetromino.blocks.map((b) => k.vec2(-b.y, b.x));
-
-  // rotating makes some offsets negative: shift so the bounding box
-  // starts at (0, 0) again, which keeps originCell as its top-left corner
-  const minX = Math.min(...rotated.map((b) => b.x));
-  const minY = Math.min(...rotated.map((b) => b.y));
-  tetromino.blocks = rotated.map((b) => b.sub(k.vec2(minX, minY)));
+  tetromino.blocks = rotated;
 }
