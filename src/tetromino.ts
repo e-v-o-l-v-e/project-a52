@@ -101,7 +101,7 @@ export function getPolies(k: KAPLAYCtx): Tetromino[] {
   };
 
   const Z: Tetromino = {
-    colors: [240, 0, 0],
+    colors: [210, 90, 145],
     blocks: [
       //            1      2
       //             XXXXXX
