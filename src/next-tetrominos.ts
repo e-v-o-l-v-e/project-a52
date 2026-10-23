@@ -1,28 +1,31 @@
 import { KAPLAYCtx } from "kaplay";
-import type { GameObj, PosComp, FixedComp } from "kaplay";
-import { Tetromino, getRandomPoly } from "./tetromino";
+import type { GameObj, PosComp } from "kaplay";
+import { Tetromino, getRandomPoly, rotatePoly } from "./tetromino";
 import { tile_size } from "./grid";
 
-const PANEL_W = 100;
-const PANEL_H = 300;
+export const PANEL_X = 20;
+export const PANEL_Y = 20;
+export const PANEL_W = 100;
+export const SLOT_H = 100;            // height of one slot (current piece + each queued piece)
 const PADDING = 10;
 const NB_NEXT = 3;
+const PANEL_H = SLOT_H * (NB_NEXT + 1);
 
-export interface NextTetrominosUI {
-  UI: GameObj<PosComp | FixedComp>;
+interface PieceState {
   previews: GameObj<PosComp>;
-  nextTetrominos: Tetromino[];
+  current: Tetromino;
+  queue: Tetromino[];                 // queue[0] is the next piece
 }
 
-let nextTetrominosUI: NextTetrominosUI;
+let state: PieceState;
 
-// Creates the Panel
+function getState(): PieceState {
+  if (!state) throw new Error("createNextTetrominosUI(k) must be called first");
+  return state;
+}
 
 export function createNextTetrominosUI(k: KAPLAYCtx) {
-  const UI = k.add([
-    k.pos(20, 20),
-    k.fixed(),
-  ]);
+  const UI = k.add([k.pos(PANEL_X, PANEL_Y), k.fixed()]);
 
   const panel = UI.add([
     k.rect(PANEL_W, PANEL_H, { radius: 16 }),
@@ -32,69 +35,78 @@ export function createNextTetrominosUI(k: KAPLAYCtx) {
     k.anchor("topleft"),
   ]);
 
-  // Conteneur qu'on videra à chaque mise à jour
+  // separator between the current piece and the queue
+  panel.add([
+    k.rect(PANEL_W - 2 * PADDING, 2),
+    k.color(k.rgb(61, 55, 55)),
+    k.pos(PADDING, SLOT_H),
+  ]);
+
+  // emptied and refilled on every update
   const previews = panel.add([k.pos(0, 0)]);
 
-  nextTetrominosUI = {
-    UI,
+  state = {
     previews,
-    nextTetrominos: Array.from({ length: NB_NEXT }, () => getRandomPoly(k)),
+    current: getRandomPoly(k),
+    queue: Array.from({ length: NB_NEXT }, () => getRandomPoly(k)),
   };
 
-  renderNextTetrominos(k);
+  renderPanel(k);
 }
 
-// Refreshes the shown tetrominos in the panel
+// draws one piece centered in the slot starting at slotTop
+function drawPiece(k: KAPLAYCtx, parent: GameObj, tetromino: Tetromino, slotTop: number) {
+  // bounding box: offsets can be negative since (0, 0) is the pivot block
+  const xs = tetromino.blocks.map((b) => b.x);
+  const ys = tetromino.blocks.map((b) => b.y);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const w = Math.max(...xs) - minX + tile_size;
+  const h = Math.max(...ys) - minY + tile_size;
 
-export function renderNextTetrominos(k: KAPLAYCtx) {
-  const { previews, nextTetrominos } = nextTetrominosUI;
-  previews.removeAll();
-  if (nextTetrominos.length === 0) return;
+  const scale = (PANEL_W - 2 * PADDING) / (4 * tile_size);
 
-  const slotH = PANEL_H / nextTetrominos.length;
-  const previewScale = (PANEL_W - 2 * PADDING) / (4 * tile_size);
+  const piece = parent.add([
+    k.pos(
+      (PANEL_W - w * scale) / 2,
+      slotTop + (SLOT_H - h * scale) / 2,
+    ),
+    k.scale(scale),
+  ]);
 
-  nextTetrominos.forEach((tetromino, i) => {
-    const w = Math.max(...tetromino.blocks.map(b => b.x)) + tile_size;
-    const h = Math.max(...tetromino.blocks.map(b => b.y)) + tile_size;
-
-    const preview = previews.add([
-      k.pos(
-        (PANEL_W - w * previewScale) / 2,
-        i * slotH + (slotH - h * previewScale) / 2,
-      ),
-      k.scale(previewScale),
+  const [r, g, b] = tetromino.colors;
+  tetromino.blocks.forEach((pos) => {
+    piece.add([
+      k.rect(tile_size, tile_size),
+      k.pos(pos.x - minX, pos.y - minY),   // shift so the shape starts at the piece's origin
+      k.color(r, g, b),
+      k.outline(2, k.rgb(0, 0, 0)),
     ]);
-
-    const [r, g, b] = tetromino.colors;
-    tetromino.blocks.forEach(pos => {
-      preview.add([
-        k.rect(tile_size, tile_size),
-        k.pos(pos),
-        k.color(r, g, b),
-        k.outline(2, k.rgb(0, 0, 0)),
-      ]);
-    });
   });
 }
 
-// Returns the next tetromino, removes it from the table, adds a new one and refreshes the panel
+function renderPanel(k: KAPLAYCtx) {
+  const { previews, current, queue } = getState();
+  previews.removeAll();
 
-export function getNextTetromino(k: KAPLAYCtx): Tetromino {
-  const next_piece = nextTetrominosUI.nextTetrominos[2]
-
-  nextTetrominosUI.nextTetrominos[2] = nextTetrominosUI.nextTetrominos[1]
-
-  nextTetrominosUI.nextTetrominos[1] = nextTetrominosUI.nextTetrominos[0]
-
-  nextTetrominosUI.nextTetrominos[0] = getRandomPoly(k)
-
-  renderNextTetrominos(k);
-
-  return next_piece
+  drawPiece(k, previews, current, 0);
+  queue.forEach((tetromino, i) => drawPiece(k, previews, tetromino, (i + 1) * SLOT_H));
 }
 
+export function getCurrentTetromino(): Tetromino {
+  return getState().current;
+}
 
-export function justGetNextTetromino(k: KAPLAYCtx){
-  return nextTetrominosUI.nextTetrominos[2]
+// the queued piece becomes the current one, a new random piece joins the queue
+export function advanceTetromino(k: KAPLAYCtx): Tetromino {
+  const s = getState();
+  s.current = s.queue.shift()!;
+  s.queue.push(getRandomPoly(k));
+  renderPanel(k);
+  return s.current;
+}
+
+export function rotateCurrent(k: KAPLAYCtx) {
+  rotatePoly(k, getState().current);
+  renderPanel(k);
 }

@@ -1,32 +1,25 @@
 import { KAPLAYCtx } from "kaplay";
-import { rotatePoly } from "./tetromino";
-import { justGetNextTetromino } from "./next-tetrominos";
-import { setupPlacementPreview } from "./preview";
+import { PANEL_X, PANEL_Y, PANEL_W, SLOT_H, rotateCurrent } from "./next-tetrominos";
 
 export function setupRotationButton(k: KAPLAYCtx) {
-    const rec_width = 80;
-    const rec_height = 80;
+  const size = 60;
 
-    k.loadSprite("rotate", "sprites/refresh-cw.png")
+  k.loadSprite("rotate", "sprites/refresh-cw.png");
 
-    const btn = k.add([
-        k.rect(rec_width, rec_height, { radius: 8 }),
-        k.pos(120,235),
-        k.color(k.rgb(208, 209, 209)),
-        k.outline(2),
-        k.area(),
-        k.fixed(),
-    ]);
+  const btn = k.add([
+    k.rect(size, size, { radius: 8 }),
+    k.pos(PANEL_X + PANEL_W + 10, PANEL_Y + (SLOT_H - size) / 2),
+    k.color(k.rgb(208, 209, 209)),
+    k.outline(2),
+    k.area(),
+    k.fixed(),
+  ]);
 
-    btn.add([
-        k.sprite("rotate"),
-        k.anchor("center"),
-        k.pos(40, 40),
-        k.color(255, 255, 255),
-    ]);
+  btn.add([
+    k.sprite("rotate"),
+    k.anchor("center"),
+    k.pos(size / 2, size / 2),
+  ]);
 
-    btn.onClick(() => {
-        rotatePoly(k, justGetNextTetromino(k));
-        //
-    });
+  btn.onClick(() => rotateCurrent(k));
 }

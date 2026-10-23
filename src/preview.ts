@@ -1,73 +1,55 @@
 import { KAPLAYCtx, GameObj, ColorComp } from "kaplay";
 import { tile_size } from "./grid";
-import { getRandomPoly, placementAvailable, placePoly, rotatePoly, Tetromino } from "./tetromino";
-import { getNextTetromino } from "./next-tetrominos";
+import { placementAvailable, placePoly, Tetromino } from "./tetromino";
+import { getCurrentTetromino, advanceTetromino, rotateCurrent } from "./next-tetrominos";
 
-const BLOCKED_COLORS = [255, 50, 50];
+const BLOCKED_COLORS: [number, number, number] = [255, 50, 50];
 
 export function setupPlacementPreview(k: KAPLAYCtx) {
-  let currentPoly: Tetromino = getNextTetromino(k);
   let previewContainer: GameObj | null = null;
+  let renderedPoly: Tetromino | null = null;
+  let renderedBlocks: Tetromino["blocks"] | null = null;
 
-  // render preview
-  function renderPreview() {
-    if (previewContainer) previewContainer.destroy();
-
+  function renderPreview(poly: Tetromino) {
+    previewContainer?.destroy();
     previewContainer = k.add([k.pos(0, 0)]);
 
-    let colors = [];
-    if (placementAvailable(k, k.toWorld(k.mousePos()), currentPoly)) {
-      colors = currentPoly.colors;
-    } else {
-      colors = BLOCKED_COLORS;
-    }
-
-    currentPoly.blocks.forEach((blockPos) => {
+    poly.blocks.forEach((blockPos) => {
       previewContainer!.add([
         k.rect(tile_size, tile_size),
         k.pos(blockPos),
-        k.color(colors[0], colors[1], colors[2]),
+        k.color(0, 0, 0), // real color set on update
         k.opacity(0.4),
         k.outline(2, k.rgb(255, 255, 255)),
       ]);
     });
+
+    renderedPoly = poly;
+    renderedBlocks = poly.blocks;
   }
 
-  renderPreview();
-
-  // update preview position with snap
   k.onUpdate(() => {
-    if (!previewContainer) return;
+    const poly = getCurrentTetromino();
+
+    if (poly !== renderedPoly || poly.blocks !== renderedBlocks) renderPreview(poly);
 
     const mouseWorld = k.toWorld(k.mousePos());
-    previewContainer.pos = k.vec2(
+    previewContainer!.pos = k.vec2(
       mouseWorld.x - (mouseWorld.x % tile_size),
       mouseWorld.y - (mouseWorld.y % tile_size)
     );
 
-    const [r, g, b] = placementAvailable(k, mouseWorld, currentPoly)
-      ? currentPoly.colors
-      : BLOCKED_COLORS;
-
-    previewContainer.children.forEach((child) => {
+    const [r, g, b] = placementAvailable(k, mouseWorld, poly) ? poly.colors : BLOCKED_COLORS;
+    previewContainer!.children.forEach((child) => {
       (child as GameObj<ColorComp>).color = k.rgb(r, g, b);
     });
   });
 
-  // try placing current piece on right click
+  // right click: place the current piece, then move on to the next one
   k.onMousePress("right", () => {
-    const mouseWorld = k.toWorld(k.mousePos());
-    const placed = placePoly(k, mouseWorld, currentPoly);
-
-    // advance to next piece only if placement succeeded
-    if (placed) {
-      currentPoly = getNextTetromino(k);
-      renderPreview();
-    }
+    const placed = placePoly(k, k.toWorld(k.mousePos()), getCurrentTetromino());
+    if (placed) advanceTetromino(k);   // the preview rebuilds itself next frame
   });
 
-  k.onKeyPress("r", () => {
-    rotatePoly(k, currentPoly);
-    renderPreview();
-  });
+  k.onKeyPress("r", () => rotateCurrent(k));
 }
