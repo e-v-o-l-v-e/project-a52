@@ -93,3 +93,8 @@ export function getNextTetromino(k: KAPLAYCtx): Tetromino {
 
   return next_piece
 }
+
+
+export function justGetNextTetromino(k: KAPLAYCtx){
+  return nextTetrominosUI.nextTetrominos[2]
+}
